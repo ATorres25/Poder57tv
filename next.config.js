@@ -1,20 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+
   images: {
     remotePatterns: [
-      // YouTube thumbnails (hero, videos)
+      // YouTube thumbnails
       {
         protocol: "https",
         hostname: "i.ytimg.com",
       },
 
-      // UploadThing (imágenes de noticias)
+      // UploadThing (noticias)
       {
         protocol: "https",
         hostname: "utfs.io",
       },
 
-      // Placeholder (por si se usa alguno)
+      // Placeholder
       {
         protocol: "https",
         hostname: "via.placeholder.com",
