@@ -68,7 +68,7 @@ export default function NuevaNoticiaPage() {
         <div>
           <p className="mb-2">Imagen de portada</p>
 
-          <UploadButton<OurFileRouter>
+          <UploadButton<OurFileRouter, "newsImage">
             endpoint="newsImage"
             onClientUploadComplete={(res) => {
               if (res && res[0]?.url) {

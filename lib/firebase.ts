@@ -93,9 +93,12 @@ export async function getAgenda(): Promise<Partido[]> {
 
   return snapshot.docs
     .map((doc) => {
-      const data = doc.data() as Partido;
-      return { id: doc.id, ...data };
-    })
+  const data = doc.data() as Omit<Partido, "id">;
+  return {
+    id: doc.id,
+    ...data,
+  };
+})
     .filter((p) => {
       if (p.estado === "en_vivo") return true;
 

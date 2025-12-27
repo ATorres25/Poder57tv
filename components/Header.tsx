@@ -1,9 +1,14 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function Header() {
+export interface HeaderProps {
+  hasLive: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ hasLive }) => {
   return (
     <header className="w-full bg-black border-b border-neutral-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -16,32 +21,34 @@ export default function Header() {
             width={160}
             height={48}
             priority
-            unoptimized
           />
         </Link>
 
         {/* NAV */}
         <nav className="hidden md:flex gap-8 text-sm font-semibold text-gray-300">
-          <Link href="/" className="hover:text-white transition">
-            Inicio
-          </Link>
           <Link href="/noticias" className="hover:text-white transition">
             Noticias
           </Link>
           <Link href="/videos" className="hover:text-white transition">
             Videos
           </Link>
+          <Link href="/entrevistas" className="hover:text-white transition">
+            Entrevistas
+          </Link>
         </nav>
 
         {/* BOTÓN EN VIVO */}
-        <Link
-          href="/en-vivo"
-          className="bg-red-600 px-4 py-2 rounded-md text-sm font-bold text-white hover:bg-red-700 transition"
-        >
-          🔴 EN VIVO
-        </Link>
-
+        {hasLive && (
+          <Link
+            href="/en-vivo"
+            className="bg-red-600 px-4 py-2 rounded-md text-sm font-bold text-white hover:bg-red-700 transition animate-pulse"
+          >
+            🔴 EN VIVO
+          </Link>
+        )}
       </div>
     </header>
   );
-}
+};
+
+export default Header;

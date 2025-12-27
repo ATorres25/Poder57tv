@@ -1,18 +1,19 @@
 "use client";
 
 import { UploadButton } from "@uploadthing/react";
-import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 export default function ImageUploader({
   onUploadComplete,
 }: {
   onUploadComplete: (url: string) => void;
 }) {
+  const UTButton = UploadButton as any;
+
   return (
     <div className="flex flex-col gap-3">
-      <UploadButton<OurFileRouter>
+      <UTButton
         endpoint="imageUploader"
-        onClientUploadComplete={(res) => {
+        onClientUploadComplete={(res: any[]) => {
           if (res && res[0]?.url) {
             onUploadComplete(res[0].url);
           }
@@ -22,7 +23,9 @@ export default function ImageUploader({
         }}
       />
 
-      <p className="text-sm text-gray-400">Formatos: JPG, PNG — Máx. 4MB</p>
+      <p className="text-sm text-gray-400">
+        Formatos: JPG, PNG — Máx. 4MB
+      </p>
     </div>
   );
 }

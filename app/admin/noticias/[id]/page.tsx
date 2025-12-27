@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import dynamic from "next/dynamic";
 import { UploadButton } from "@uploadthing/react";
+
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 // Editor TipTap (solo cliente)
@@ -67,7 +68,7 @@ export default function EditarNoticiaPage() {
 
       alert("Noticia actualizada correctamente");
       router.push("/admin/noticias");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       alert("Error al guardar los cambios");
     } finally {
@@ -91,11 +92,11 @@ export default function EditarNoticiaPage() {
         className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
       />
 
-      {/* Imagen */}
+      {/* Imagen principal */}
       <div>
         <p className="mb-2">Imagen principal</p>
 
-        <UploadButton<OurFileRouter>
+        <UploadButton<OurFileRouter, "newsImage">
           endpoint="newsImage"
           onClientUploadComplete={(res) => {
             if (res && res[0]?.url) {
@@ -106,7 +107,11 @@ export default function EditarNoticiaPage() {
         />
 
         {image && (
-          <img src={image} alt="preview" className="w-full rounded mt-3" />
+          <img
+            src={image}
+            alt="preview"
+            className="w-full rounded mt-3"
+          />
         )}
       </div>
 

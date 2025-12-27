@@ -2,7 +2,7 @@
 import { getVideoById, getLatestVideos } from "@/lib/youtube";
 import Link from "next/link";
 import { format } from "date-fns";
-import es from "date-fns/locale/es";
+import { es } from "date-fns/locale";
 import VideoActions from "@/components/VideoActions";
 
 type Props = {
