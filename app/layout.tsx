@@ -29,9 +29,15 @@ export default async function RootLayout({
 
   return (
     <html lang="es">
-      <body className="bg-black text-white">
+      <body className="relative bg-black text-white overflow-x-hidden">
 
-        {/* HEADER GLOBAL */}
+        {/* 🌌 FONDO GLOW AZUL GLOBAL */}
+        <div className="pointer-events-none fixed inset-0 -z-10">
+          <div className="absolute -top-64 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] rounded-full bg-poderblue/20 blur-[200px] animate-glow-float" />
+          <div className="absolute top-[40%] left-[8%] w-[700px] h-[700px] rounded-full bg-poderblue/10 blur-[180px]" />
+        </div>
+
+        {/* HEADER */}
         <Header hasLive={hasLive} />
 
         {/* CONTENIDO */}

@@ -2,9 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const pathname = request.nextUrl.pathname;
 
-  // Solo proteger rutas /admin (excepto login)
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }

@@ -10,42 +10,50 @@ export interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ hasLive }) => {
   return (
-    <header className="w-full bg-black border-b border-neutral-800 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <header className="w-full bg-black/80 backdrop-blur border-b border-neutral-800 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
 
         {/* LOGO */}
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/logo.png"
-            alt="Poder57tv"
-            width={160}
-            height={48}
+            alt="Poder57TV"
+            width={150}
+            height={44}
             priority
           />
         </Link>
 
-        {/* NAV */}
-        <nav className="hidden md:flex gap-8 text-sm font-semibold text-gray-300">
-          <Link href="/noticias" className="hover:text-white transition">
-            Noticias
-          </Link>
-          <Link href="/videos" className="hover:text-white transition">
-            Videos
-          </Link>
-          <Link href="/entrevistas" className="hover:text-white transition">
-            Entrevistas
-          </Link>
-        </nav>
+        {/* CTAs */}
+        <div className="flex items-center gap-3 ml-auto">
 
-        {/* BOTÓN EN VIVO */}
-        {hasLive && (
-          <Link
-            href="/en-vivo"
-            className="bg-red-600 px-4 py-2 rounded-md text-sm font-bold text-white hover:bg-red-700 transition animate-pulse"
+          {hasLive && (
+            <Link
+              href="/en-vivo"
+              className="hidden sm:flex items-center gap-1 bg-red-600 px-3 py-2 rounded-md text-xs font-extrabold text-white hover:bg-red-700 transition animate-live-pulse"
+            >
+              🔴 EN VIVO
+            </Link>
+          )}
+
+          <a
+            href="https://www.youtube.com/@poder57tv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-red-600 hover:bg-red-700 transition px-3 py-2 rounded-md text-xs font-bold text-white"
           >
-            🔴 EN VIVO
-          </Link>
-        )}
+            Youtube
+          </a>
+
+          <a
+            href="https://www.facebook.com/Poder57tv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-blue-600 hover:bg-blue-700 transition px-3 py-2 rounded-md text-xs font-bold text-white"
+          >
+            Facebook
+          </a>
+        </div>
       </div>
     </header>
   );

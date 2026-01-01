@@ -30,7 +30,9 @@ export default function AdminPage() {
   if (!user)
     return (
       <div className="max-w-md mx-auto py-20">
-        <h1 className="text-2xl font-bold mb-4">Panel de administración</h1>
+        <h1 className="text-2xl font-bold mb-4">
+          Panel de administración
+        </h1>
 
         <form onSubmit={login} className="space-y-4">
           <input
@@ -55,18 +57,37 @@ export default function AdminPage() {
     );
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Panel Administrativo</h1>
+    <div className="max-w-xl mx-auto space-y-6 py-10">
+      <h1 className="text-3xl font-bold text-center">
+        Panel Administrativo
+      </h1>
 
-      <nav className="space-y-3">
-        <Link href="/admin/noticias" className="block text-blue-400">
+      <nav className="grid gap-4">
+        <Link
+          href="/admin/agenda"
+          className="block bg-gray-800 hover:bg-gray-700 p-4 rounded text-center text-lg"
+        >
+          📅 Gestionar Agenda
+        </Link>
+
+        <Link
+          href="/admin/noticias"
+          className="block bg-gray-800 hover:bg-gray-700 p-4 rounded text-center text-lg"
+        >
           📰 Gestionar Noticias
+        </Link>
+
+        <Link
+          href="/admin/galerias"
+          className="block bg-gray-800 hover:bg-gray-700 p-4 rounded text-center text-lg"
+        >
+          📸 Gestionar Galerías Facebook
         </Link>
       </nav>
 
       <button
         onClick={logout}
-        className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
+        className="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded"
       >
         Cerrar sesión
       </button>

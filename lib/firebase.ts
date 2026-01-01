@@ -38,6 +38,7 @@ export type Noticia = {
   image: string;
   published: boolean;
   date: Timestamp;
+  priority?: "main" | "side" | null;
 };
 
 export async function getNoticias(): Promise<Noticia[]> {
@@ -60,6 +61,7 @@ export async function getNoticias(): Promise<Noticia[]> {
           "https://via.placeholder.com/800x450.png?text=Noticia",
         published: data.published ?? false,
         date: data.date,
+        priority: data.priority ?? null,
       };
     })
     .filter((n) => n.published === true);
@@ -73,8 +75,8 @@ export type Partido = {
   liga: string;
   local: string;
   visitante: string;
-  fecha: string; // YYYY-MM-DD
-  hora: string;  // HH:mm
+  fecha: string;
+  hora: string;
   estado: "programado" | "en_vivo" | "finalizado";
   createdAt: Timestamp;
 };
@@ -89,20 +91,38 @@ export async function getAgenda(): Promise<Partido[]> {
   const snapshot = await getDocs(q);
 
   const ahora = new Date();
-  const limite = new Date(ahora.getTime() - 2 * 60 * 60 * 1000); // -2 horas
+  const limite = new Date(ahora.getTime() - 2 * 60 * 60 * 1000);
 
   return snapshot.docs
-    .map((doc) => {
-  const data = doc.data() as Omit<Partido, "id">;
-  return {
-    id: doc.id,
-    ...data,
-  };
-})
+    .map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Omit<Partido, "id">),
+    }))
     .filter((p) => {
       if (p.estado === "en_vivo") return true;
-
       const fechaHora = new Date(`${p.fecha}T${p.hora}:00`);
       return fechaHora >= limite;
     });
+}
+
+/* =========================
+   📘 GALERÍAS FACEBOOK
+========================= */
+export type FacebookGallery = {
+  position: number;
+  facebookUrl: string;
+  active: boolean;
+};
+
+export async function getFacebookGalleries(): Promise<FacebookGallery[]> {
+  const q = query(
+    collection(db, "facebookGalleries"),
+    orderBy("position", "asc")
+  );
+
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs
+    .map((doc) => doc.data() as FacebookGallery)
+    .filter((g) => g.active === true);
 }

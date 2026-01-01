@@ -2,7 +2,14 @@
 
 import { signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +18,7 @@ type Noticia = {
   id: string;
   title: string;
   date: any;
+  priority?: "main" | "side" | null;
 };
 
 export default function AdminNoticiasPage() {
@@ -26,26 +34,47 @@ export default function AdminNoticiasPage() {
   }
 
   // 📥 Cargar noticias
+  async function loadNoticias() {
+    const q = query(
+      collection(db, "noticias"),
+      orderBy("date", "desc")
+    );
+
+    const snap = await getDocs(q);
+
+    const data = snap.docs.map((docu) => ({
+      id: docu.id,
+      ...(docu.data() as any),
+    }));
+
+    setNoticias(data);
+    setLoading(false);
+  }
+
   useEffect(() => {
-    async function loadNoticias() {
-      const q = query(
-        collection(db, "noticias"),
-        orderBy("date", "desc")
-      );
-
-      const snap = await getDocs(q);
-
-      const data = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as any),
-      }));
-
-      setNoticias(data);
-      setLoading(false);
-    }
-
     loadNoticias();
   }, []);
+
+  // ⭐ Cambiar prioridad
+  async function setPriority(
+    id: string,
+    priority: "main" | "side" | null
+  ) {
+    const ref = doc(db, "noticias", id);
+
+    // si es principal, quitar a las demás
+    if (priority === "main") {
+      const main = noticias.find((n) => n.priority === "main");
+      if (main && main.id !== id) {
+        await updateDoc(doc(db, "noticias", main.id), {
+          priority: null,
+        });
+      }
+    }
+
+    await updateDoc(ref, { priority });
+    await loadNoticias();
+  }
 
   return (
     <div className="space-y-6">
@@ -81,21 +110,48 @@ export default function AdminNoticiasPage() {
           {noticias.map((n) => (
             <div
               key={n.id}
-              className="flex items-center justify-between bg-gray-900 border border-gray-800 rounded p-4"
+              className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-gray-900 border border-gray-800 rounded p-4"
             >
               <div>
-                <p className="font-semibold">{n.title}</p>
+                <p className="font-semibold">
+                  {n.title}{" "}
+                  {n.priority === "main" && "⭐"}
+                  {n.priority === "side" && "📌"}
+                </p>
                 <p className="text-sm text-gray-400">
                   {n.date?.toDate?.().toLocaleDateString("es-MX")}
                 </p>
               </div>
 
-              <Link
-                href={`/admin/noticias/${n.id}`}
-                className="text-blue-400 hover:underline"
-              >
-                Editar
-              </Link>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setPriority(n.id, "main")}
+                  className="bg-yellow-600 hover:bg-yellow-700 px-3 py-1 rounded text-sm"
+                >
+                  Principal
+                </button>
+
+                <button
+                  onClick={() => setPriority(n.id, "side")}
+                  className="bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded text-sm"
+                >
+                  Secundaria
+                </button>
+
+                <button
+                  onClick={() => setPriority(n.id, null)}
+                  className="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm"
+                >
+                  Quitar
+                </button>
+
+                <Link
+                  href={`/admin/noticias/${n.id}`}
+                  className="text-blue-400 hover:underline text-sm self-center"
+                >
+                  Editar
+                </Link>
+              </div>
             </div>
           ))}
         </div>

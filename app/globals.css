@@ -1,28 +1,12 @@
-/* ================================
-   🧱 TAILWIND BASE
-================================ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ================================
-   🌐 VARIABLES GLOBALES
-================================ */
 :root {
-  --background: #0f0f0f;
+  --background: #05070c;
   --foreground: #ededed;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-/* ================================
-   🧱 BASE
-================================ */
 body {
   background: var(--background);
   color: var(--foreground);
@@ -31,10 +15,9 @@ body {
 }
 
 /* ================================
-   🎬 ANIMACIONES PODER57TV
+   🎬 MICRO ANIMACIONES
 ================================ */
 
-/* Fade + slide up */
 @keyframes fade-up {
   from {
     opacity: 0;
@@ -50,7 +33,7 @@ body {
   animation: fade-up 0.6s ease-out both;
 }
 
-/* Hover lift (cards, bloques) */
+/* Cards lift */
 .hover-lift {
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
@@ -60,7 +43,7 @@ body {
   box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
 }
 
-/* Hover zoom solo imágenes */
+/* Zoom imagen */
 .hover-zoom img {
   transition: transform 0.4s ease;
 }
@@ -69,116 +52,7 @@ body {
   transform: scale(1.06);
 }
 
-/* ================================
-   📰 CINTILLO (TICKER)
-================================ */
-@keyframes ticker {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-.animate-ticker {
-  animation: ticker 30s linear infinite;
-}
-
-.pause-on-hover:hover {
-  animation-play-state: paused;
-}
-
-/* ================================
-   ✨ DETALLES FINOS
-================================ */
-
-/* Suavizar links */
-a {
-  transition: color 0.25s ease;
-}
-
-/* Mejor lectura de texto largo */
+/* Mejor lectura */
 .prose {
   line-height: 1.75;
-}
-
-/* ================================
-   🎬 HERO ANIMATIONS
-================================ */
-
-/* Entrada hero */
-@keyframes hero-enter {
-  from {
-    opacity: 0;
-    transform: translateY(22px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-hero-enter {
-  animation: hero-enter 0.7s ease-out both;
-}
-
-/* ================================
-   🔴 CONTADOR EN VIVO
-================================ */
-.live-counter {
-  background: linear-gradient(135deg, #dc2626, #991b1b);
-  color: white;
-  font-weight: 800;
-  padding: 0.6rem 1.4rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-  box-shadow: 0 0 18px rgba(220, 38, 38, 0.45);
-}
-
-/* Pulso suave */
-@keyframes live-pulse {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: 0 0 18px rgba(220, 38, 38, 0.45);
-  }
-  50% {
-    transform: scale(1.04);
-    box-shadow: 0 0 28px rgba(220, 38, 38, 0.75);
-  }
-}
-
-.animate-live-pulse {
-  animation: live-pulse 2s ease-in-out infinite;
-}
-
-/* ================================
-   🔴 BADGE EN VIVO (GLOW HERO)
-================================ */
-.live-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, #dc2626, #991b1b);
-  color: white;
-  font-weight: 800;
-  padding: 0.45rem 0.9rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  box-shadow: 0 0 12px rgba(220, 38, 38, 0.55);
-  animation: live-glow 2.2s ease-in-out infinite;
-}
-
-/* Glow suave, profesional */
-@keyframes live-glow {
-  0%, 100% {
-    box-shadow:
-      0 0 10px rgba(220, 38, 38, 0.45),
-      0 0 20px rgba(220, 38, 38, 0.35);
-  }
-  50% {
-    box-shadow:
-      0 0 18px rgba(220, 38, 38, 0.85),
-      0 0 36px rgba(220, 38, 38, 0.65);
-  }
 }

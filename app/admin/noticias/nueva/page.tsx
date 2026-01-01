@@ -8,7 +8,6 @@ import dynamic from "next/dynamic";
 import { UploadButton } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
-// Editor solo en cliente
 const RichEditor = dynamic(
   () => import("@/components/admin/RichEditor"),
   { ssr: false }
@@ -18,8 +17,9 @@ export default function NuevaNoticiaPage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState(""); // 👈 CAMPO CORRECTO
+  const [image, setImage] = useState("");
   const [contentHtml, setContentHtml] = useState("");
+  const [priority, setPriority] = useState<"normal" | "main" | "side">("normal");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -35,16 +35,16 @@ export default function NuevaNoticiaPage() {
     try {
       await addDoc(collection(db, "noticias"), {
         title,
-        image,              // ✅ AQUÍ SE GUARDA LA IMAGEN
+        image,
         contentHtml,
+        priority,
         date: Timestamp.now(),
         published: true,
       });
 
       router.push("/admin/noticias");
     } catch (err: any) {
-      console.error(err);
-      alert("Error al guardar: " + err.message);
+      alert("Error: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,6 @@ export default function NuevaNoticiaPage() {
 
       <form onSubmit={onSubmit} className="space-y-5">
 
-        {/* TÍTULO */}
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -64,28 +63,34 @@ export default function NuevaNoticiaPage() {
           className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
         />
 
-        {/* IMAGEN DE PORTADA */}
+        {/* PRIORIDAD */}
+        <div>
+          <p className="mb-2 font-semibold">Prioridad</p>
+          <select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as any)}
+            className="w-full p-2 bg-gray-900 border border-gray-700 rounded"
+          >
+            <option value="normal">Normal</option>
+            <option value="main">⭐ Principal</option>
+            <option value="side">📌 Lateral</option>
+          </select>
+        </div>
+
+        {/* IMAGEN */}
         <div>
           <p className="mb-2">Imagen de portada</p>
-
           <UploadButton<OurFileRouter, "newsImage">
             endpoint="newsImage"
             onClientUploadComplete={(res) => {
-              if (res && res[0]?.url) {
-                setImage(res[0].url); // ✅ GUARDAMOS EN image
-              }
+              if (res?.[0]?.url) setImage(res[0].url);
             }}
             onUploadError={(e) =>
               alert("Error al subir imagen: " + e.message)
             }
           />
-
           {image && (
-            <img
-              src={image}
-              alt="Portada"
-              className="w-full rounded mt-3"
-            />
+            <img src={image} alt="preview" className="w-full rounded mt-3" />
           )}
         </div>
 
@@ -97,7 +102,7 @@ export default function NuevaNoticiaPage() {
 
         <button
           disabled={loading}
-          className="bg-blue-600 px-4 py-2 rounded disabled:opacity-50"
+          className="bg-blue-600 px-4 py-2 rounded"
         >
           {loading ? "Guardando..." : "Guardar noticia"}
         </button>
