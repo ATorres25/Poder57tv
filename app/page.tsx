@@ -8,9 +8,8 @@ import {
 import {
   getNoticias,
   getAgenda,
-  getFacebookGalleries,
 } from "@/lib/firebase";
-import FacebookPost from "@/app/components/FacebookPost";
+import FacebookGalleries from "@/app/components/FacebookGalleries";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +40,6 @@ export default async function Home() {
   const videos = await getLatestVideos(50);
   const noticias = await getNoticias();
   const agenda = await getAgenda();
-  const facebookGalleries = await getFacebookGalleries();
 
   /* ================= AGENDA FUTURA ================= */
   const ahora = new Date();
@@ -229,6 +227,17 @@ export default async function Home() {
         </section>
       )}
 
+      {/* ================= SPONSOR ================= */}
+      <div className="flex justify-center bg-black py-4">
+        <Image
+          src="https://5y6xtj0au7.ufs.sh/f/fONHWhCkbsJLM3vRGyERAB2y4wvKo7Dj1cNLICfbTzPSFpZG"
+          alt="Sponsors"
+          width={640}
+          height={128}
+          className="object-contain"
+        />
+      </div>
+
       {/* ================= ENTREVISTAS ================= */}
       <section>
         <h2 className="text-xl font-extrabold mb-3">Entrevistas</h2>
@@ -260,22 +269,7 @@ export default async function Home() {
       </section>
 
       {/* ================= GALERÍAS FACEBOOK ================= */}
-      {facebookGalleries.length > 0 && (
-        <section>
-          <h2 className="text-xl font-extrabold mb-4">
-            Galerías
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {facebookGalleries.map((g) => (
-              <FacebookPost
-                key={g.position}
-                url={g.facebookUrl}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+      <FacebookGalleries />
 
       {/* ================= MÁS NOTICIAS ================= */}
       {masNoticias.length > 0 && (

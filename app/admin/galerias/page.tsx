@@ -17,6 +17,28 @@ type Gallery = {
 
 const POSITIONS = [1, 2, 3, 4, 5, 6];
 
+/* =========================
+   🔧 UTIL: extraer URL real
+========================= */
+function extractFacebookUrl(input: string): string {
+  if (!input) return "";
+
+  // Si es iframe, extraer href=
+  if (input.includes("<iframe")) {
+    const match = input.match(/href=([^&"]+)/);
+    if (match?.[1]) {
+      try {
+        return decodeURIComponent(match[1]);
+      } catch {
+        return match[1];
+      }
+    }
+  }
+
+  // Si no es iframe, devolver limpio
+  return input.trim();
+}
+
 export default function AdminGaleriasPage() {
   const [loading, setLoading] = useState(true);
   const [galleries, setGalleries] = useState<Gallery[]>([]);
@@ -30,9 +52,14 @@ export default function AdminGaleriasPage() {
       collection(db, "facebookGalleries")
     );
 
-    const data = snapshot.docs.map(
-      (d) => d.data() as Gallery
-    );
+    const data: Gallery[] = snapshot.docs.map((d) => {
+      const raw = d.data();
+      return {
+        position: Number(raw.position),
+        facebookUrl: raw.facebookUrl ?? "",
+        active: Boolean(raw.active),
+      };
+    });
 
     setGalleries(data);
     setLoading(false);
@@ -48,15 +75,35 @@ export default function AdminGaleriasPage() {
     );
   }
 
+  function updateGallery(updated: Gallery) {
+    setGalleries((prev) => {
+      const filtered = prev.filter(
+        (g) => g.position !== updated.position
+      );
+      return [...filtered, updated];
+    });
+  }
+
   async function saveGallery(gallery: Gallery) {
+    const cleanUrl = extractFacebookUrl(
+      gallery.facebookUrl
+    );
+
     const ref = doc(
       db,
       "facebookGalleries",
       String(gallery.position)
     );
 
-    await setDoc(ref, gallery);
-    alert("Galería guardada");
+    await setDoc(ref, {
+      position: gallery.position,
+      facebookUrl: cleanUrl,
+      active: gallery.active,
+    });
+
+    alert(
+      `Galería ${gallery.position} guardada correctamente`
+    );
   }
 
   if (loading)
@@ -73,7 +120,7 @@ export default function AdminGaleriasPage() {
       </h1>
 
       <p className="text-center text-gray-400 text-sm">
-        Cada posición corresponde a una galería en Home (máx. 6)
+        Puedes pegar el iframe completo o el link del post
       </p>
 
       <div className="space-y-4">
@@ -89,22 +136,16 @@ export default function AdminGaleriasPage() {
                 Galería #{pos}
               </h2>
 
-              <input
-                type="text"
-                placeholder="https://www.facebook.com/share/p/XXXX/"
+              <textarea
+                placeholder="Pega aquí el iframe o link de Facebook"
                 value={gallery.facebookUrl}
-                onChange={(e) => {
-                  const updated = galleries.filter(
-                    (g) => g.position !== pos
-                  );
-                  setGalleries([
-                    ...updated,
-                    {
-                      ...gallery,
-                      facebookUrl: e.target.value,
-                    },
-                  ]);
-                }}
+                onChange={(e) =>
+                  updateGallery({
+                    ...gallery,
+                    facebookUrl: e.target.value,
+                  })
+                }
+                rows={3}
                 className="w-full p-2 bg-black border border-gray-700 rounded text-sm"
               />
 
@@ -112,18 +153,12 @@ export default function AdminGaleriasPage() {
                 <input
                   type="checkbox"
                   checked={gallery.active}
-                  onChange={(e) => {
-                    const updated = galleries.filter(
-                      (g) => g.position !== pos
-                    );
-                    setGalleries([
-                      ...updated,
-                      {
-                        ...gallery,
-                        active: e.target.checked,
-                      },
-                    ]);
-                  }}
+                  onChange={(e) =>
+                    updateGallery({
+                      ...gallery,
+                      active: e.target.checked,
+                    })
+                  }
                 />
                 Activa
               </label>

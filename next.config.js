@@ -21,6 +21,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "via.placeholder.com",
       },
+
+      // Sponsors banner (ufs.sh)
+      {
+        protocol: "https",
+        hostname: "5y6xtj0au7.ufs.sh",
+      },
     ],
   },
 };

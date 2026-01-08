@@ -122,7 +122,13 @@ export async function getFacebookGalleries(): Promise<FacebookGallery[]> {
 
   const snapshot = await getDocs(q);
 
-  return snapshot.docs
-    .map((doc) => doc.data() as FacebookGallery)
-    .filter((g) => g.active === true);
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      position: Number(data.position),
+      facebookUrl: data.facebookUrl ?? "",
+      active: data.active === true,
+    };
+  });
 }

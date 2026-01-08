@@ -1,33 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
-
 type Props = {
   url: string;
 };
 
+function buildFacebookIframeUrl(postUrl: string) {
+  const encoded = encodeURIComponent(postUrl);
+  return `https://www.facebook.com/plugins/post.php?href=${encoded}&show_text=true&width=350`;
+}
+
 export default function FacebookPost({ url }: Props) {
-  useEffect(() => {
-    if (window.FB) {
-      window.FB.XFBML.parse();
-      return;
-    }
-
-    if (document.getElementById("facebook-jssdk")) return;
-
-    const script = document.createElement("script");
-    script.id = "facebook-jssdk";
-    script.src =
-      "https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v19.0";
-    script.async = true;
-    document.body.appendChild(script);
-  }, [url]);
+  const iframeSrc = buildFacebookIframeUrl(url);
 
   return (
-    <div
-      className="fb-post w-full flex justify-center"
-      data-href={url}
-      data-width="500"
-    />
+    <div className="w-full flex justify-center">
+      <div className="w-[350px]">
+        <iframe
+          src={iframeSrc}
+          width="350"
+          height="470"
+          style={{ border: "none", overflow: "hidden" }}
+          scrolling="no"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </div>
+    </div>
   );
 }
