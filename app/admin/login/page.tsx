@@ -14,6 +14,13 @@ export default function AdminLogin() {
     try {
       setLoading(true);
 
+      // 🔐 Validar que Auth esté disponible (solo cliente)
+      if (!auth) {
+        alert("Firebase Auth no está disponible");
+        setLoading(false);
+        return;
+      }
+
       // 1️⃣ Login con Google
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
