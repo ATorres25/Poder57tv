@@ -4,6 +4,7 @@ import Image from "next/image";
 import {
   getLatestVideos,
   getPlaylistVideos,
+  getPastLiveStreams,
 } from "@/lib/youtube";
 import {
   getNoticias,
@@ -40,6 +41,7 @@ export default async function Home() {
   const videos = await getLatestVideos(50);
   const noticias = await getNoticias();
   const agenda = await getAgenda();
+  const pastLives = await getPastLiveStreams(5);
 
   /* ================= AGENDA FUTURA ================= */
   const ahora = new Date();
@@ -64,10 +66,6 @@ export default async function Home() {
   });
 
   const heroLives = liveVideos.slice(0, 2);
-
-  const finishedLives = videos
-    .filter((v: any) => v?.liveStreamingDetails?.actualEndTime)
-    .slice(0, 5);
 
   /* ================= NOTICIAS CON PRIORIDAD ================= */
   const principal = noticias.find(
@@ -301,13 +299,13 @@ export default async function Home() {
       )}
 
       {/* ================= TRANSMISIONES ANTERIORES ================= */}
-      {finishedLives.length > 0 && (
+      {pastLives.length > 0 && (
         <section>
           <h2 className="text-xl font-extrabold mb-4">
             Transmisiones anteriores
           </h2>
           <div className="grid md:grid-cols-5 gap-4">
-            {finishedLives.map((v: any) => (
+            {pastLives.map((v: any) => (
               <Link
                 key={v.id}
                 href={`/video/${v.id}`}
