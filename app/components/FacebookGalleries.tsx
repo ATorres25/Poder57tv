@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getFacebookGalleries } from "@/lib/firebase";
 import FacebookPost from "@/app/components/FacebookPost";
+import Image from "next/image";
 
 type Gallery = {
   position: number;
@@ -29,7 +30,8 @@ export default function FacebookGalleries() {
     const onResize = () => setIsMobile(checkMobile());
     window.addEventListener("resize", onResize);
 
-    return () => window.removeEventListener("resize", onResize);
+    return () =>
+      window.removeEventListener("resize", onResize);
   }, []);
 
   /* ======================
@@ -41,10 +43,9 @@ export default function FacebookGalleries() {
         const data = await getFacebookGalleries();
 
         const activeGalleries = data
-          .filter((g: Gallery) => g.active === true)
+          .filter((g) => g.active)
           .sort(
-            (a: Gallery, b: Gallery) =>
-              a.position - b.position
+            (a, b) => a.position - b.position
           );
 
         setGalleries(activeGalleries);
@@ -100,37 +101,56 @@ export default function FacebookGalleries() {
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {galleries.map((g) => (
-          <div
-            key={g.position}
-            className="bg-gray-900 rounded-lg p-3"
-          >
-            {/* DESKTOP: iframe */}
-            {!isMobile && (
-              <FacebookPost url={g.facebookUrl} />
-            )}
+        {galleries.map((g) => {
+          // Preview image de Facebook (funciona sin token)
+          const previewImg = `https://graph.facebook.com/v19.0/?id=${encodeURIComponent(
+            g.facebookUrl
+          )}&fields=og_object{image}&access_token=`;
 
-            {/* MOBILE: fallback */}
-            {isMobile && (
-              <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
-                <p className="text-sm text-gray-300">
-                  Ver galería completa en Facebook
-                </p>
+          return (
+            <div
+              key={g.position}
+              className="bg-gray-900 rounded-xl overflow-hidden"
+            >
+              {/* DESKTOP */}
+              {!isMobile && (
+                <FacebookPost url={g.facebookUrl} />
+              )}
 
+              {/* MOBILE PREVIEW */}
+              {isMobile && (
                 <a
                   href={g.facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-blue-600 hover:bg-blue-700
-                             px-4 py-2 rounded text-white
-                             font-semibold transition"
+                  className="block group"
                 >
-                  Abrir en Facebook
+                  <div className="relative aspect-video bg-black">
+                    <Image
+                      src={previewImg}
+                      alt="Galería Facebook"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="bg-blue-600 px-4 py-2 rounded text-sm font-bold">
+                        Ver galería
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3 text-center">
+                    <p className="text-sm text-gray-300">
+                      Abrir galería en Facebook
+                    </p>
+                  </div>
                 </a>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
     </section>
   );
