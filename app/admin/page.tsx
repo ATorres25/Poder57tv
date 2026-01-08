@@ -2,7 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth";
 import Link from "next/link";
 
 export default function AdminPage() {
@@ -11,11 +15,23 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    return auth.onAuthStateChanged((u) => setUser(u));
+    if (!auth) return;
+
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   async function login(e: any) {
     e.preventDefault();
+
+    if (!auth) {
+      alert("Auth no disponible");
+      return;
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (e: any) {
@@ -24,6 +40,7 @@ export default function AdminPage() {
   }
 
   async function logout() {
+    if (!auth) return;
     await signOut(auth);
   }
 
