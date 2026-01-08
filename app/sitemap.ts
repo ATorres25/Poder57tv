@@ -1,16 +1,8 @@
 // app/sitemap.ts
 import type { MetadataRoute } from "next";
-import { getNoticias } from "@/lib/firebase";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.poder57tv.com";
-
-  const noticias = await getNoticias();
-
-  const noticiasUrls = noticias.map((n) => ({
-    url: `${baseUrl}/noticias/${n.id}`,
-    lastModified: n.date?.toDate?.() ?? new Date(),
-  }));
 
   return [
     {
@@ -21,6 +13,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/noticias`,
       lastModified: new Date(),
     },
-    ...noticiasUrls,
   ];
 }
