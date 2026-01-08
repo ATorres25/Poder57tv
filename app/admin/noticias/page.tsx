@@ -28,9 +28,16 @@ export default function AdminNoticiasPage() {
 
   // 🔐 LOGOUT
   async function logout() {
-    await signOut(auth);
-    document.cookie = "admin_session=; path=/; max-age=0";
-    router.replace("/admin/login");
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    } finally {
+      document.cookie = "admin_session=; path=/; max-age=0";
+      router.replace("/admin/login");
+    }
   }
 
   // 📥 Cargar noticias
@@ -78,7 +85,6 @@ export default function AdminNoticiasPage() {
 
   return (
     <div className="space-y-6">
-
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">📰 Noticias</h1>
