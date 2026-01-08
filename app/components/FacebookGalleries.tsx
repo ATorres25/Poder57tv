@@ -15,21 +15,22 @@ export default function FacebookGalleries() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [imgError, setImgError] = useState<Record<number, boolean>>({});
 
   /* ======================
      📱 Detectar mobile
   ====================== */
   useEffect(() => {
-    const checkMobile = () => {
-      if (typeof window === "undefined") return false;
-      return window.innerWidth < 768;
-    };
+    const checkMobile = () =>
+      typeof window !== "undefined" &&
+      window.innerWidth < 768;
 
     setIsMobile(checkMobile());
 
-    const onResize = () => setIsMobile(checkMobile());
-    window.addEventListener("resize", onResize);
+    const onResize = () =>
+      setIsMobile(checkMobile());
 
+    window.addEventListener("resize", onResize);
     return () =>
       window.removeEventListener("resize", onResize);
   }, []);
@@ -102,10 +103,12 @@ export default function FacebookGalleries() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {galleries.map((g) => {
-          // Preview image de Facebook (funciona sin token)
-          const previewImg = `https://graph.facebook.com/v19.0/?id=${encodeURIComponent(
+          const previewImg = `https://graph.facebook.com/?id=${encodeURIComponent(
             g.facebookUrl
-          )}&fields=og_object{image}&access_token=`;
+          )}&fields=og_object{image}`;
+
+          const showTextFallback =
+            isMobile && imgError[g.position];
 
           return (
             <div
@@ -117,35 +120,52 @@ export default function FacebookGalleries() {
                 <FacebookPost url={g.facebookUrl} />
               )}
 
-              {/* MOBILE PREVIEW */}
+              {/* MOBILE */}
               {isMobile && (
                 <a
                   href={g.facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block group"
+                  className="block"
                 >
-                  <div className="relative aspect-video bg-black">
-                    <Image
-                      src={previewImg}
-                      alt="Galería Facebook"
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-black/40" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="bg-blue-600 px-4 py-2 rounded text-sm font-bold">
-                        Ver galería
+                  {!showTextFallback && (
+                    <div className="relative aspect-video bg-black">
+                      <Image
+                        src={previewImg}
+                        alt="Galería Facebook"
+                        fill
+                        unoptimized
+                        className="object-cover"
+                        onError={() =>
+                          setImgError((prev) => ({
+                            ...prev,
+                            [g.position]: true,
+                          }))
+                        }
+                      />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <span className="bg-blue-600 px-4 py-2 rounded text-sm font-bold">
+                          Ver galería
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TEXTO FALLBACK */}
+                  {showTextFallback && (
+                    <div className="p-6 text-center space-y-3">
+                      <p className="text-lg font-bold">
+                        Galería en Facebook
+                      </p>
+                      <p className="text-sm text-gray-300">
+                        Toca para ver las imágenes completas
+                        directamente en Facebook.
+                      </p>
+                      <span className="inline-block bg-blue-600 px-4 py-2 rounded text-sm font-bold">
+                        Abrir galería
                       </span>
                     </div>
-                  </div>
-
-                  <div className="p-3 text-center">
-                    <p className="text-sm text-gray-300">
-                      Abrir galería en Facebook
-                    </p>
-                  </div>
+                  )}
                 </a>
               )}
             </div>
