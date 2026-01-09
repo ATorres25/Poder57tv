@@ -5,6 +5,7 @@ import {
   getLatestVideos,
   getPlaylistVideos,
   getPastLiveStreams,
+  getLiveNow,
 } from "@/lib/youtube";
 import {
   getNoticias,
@@ -39,6 +40,7 @@ function formatFecha(fecha: any) {
 
 export default async function Home() {
   const videos = await getLatestVideos(50);
+  const liveNow = await getLiveNow(); // 👈 HERO REAL
   const noticias = await getNoticias();
   const agenda = await getAgenda();
   const pastLives = await getPastLiveStreams(5);
@@ -57,15 +59,8 @@ export default async function Home() {
     6
   );
 
-  const liveVideos = videos.filter((v: any) => {
-    const isLive = v?.snippet?.liveBroadcastContent === "live";
-    const started =
-      v?.liveStreamingDetails?.actualStartTime &&
-      !v?.liveStreamingDetails?.actualEndTime;
-    return isLive || started;
-  });
-
-  const heroLives = liveVideos.slice(0, 2);
+  /* ================= HERO (LIVE ACTIVO) ================= */
+  const heroLives = liveNow.slice(0, 2);
 
   /* ================= NOTICIAS CON PRIORIDAD ================= */
   const principal = noticias.find(
@@ -123,7 +118,10 @@ export default async function Home() {
             >
               <div className="relative aspect-video">
                 <Image
-                  src={v.snippet.thumbnails.high.url}
+                  src={
+                    v.snippet.thumbnails.maxres?.url ||
+                    v.snippet.thumbnails.high?.url
+                  }
                   alt={v.snippet.title}
                   fill
                   className="object-cover transition-transform duration-500

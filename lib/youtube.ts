@@ -21,6 +21,7 @@ type YTVideoItem = {
   liveStreamingDetails?: {
     actualStartTime?: string;
     actualEndTime?: string;
+    scheduledStartTime?: string;
   };
 };
 
@@ -40,20 +41,21 @@ async function fetchJson(url: string) {
 }
 
 /* ======================================================
-   🔴 LIVE ACTIVO (HERO)
+   🔴 LIVE ACTIVO (FUENTE REAL DEL HERO)
 ====================================================== */
 export const getLiveNow = cache(async (): Promise<YTVideoItem[]> => {
   const API_KEY = process.env.YOUTUBE_API_KEY;
   const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
   if (!API_KEY || !CHANNEL_ID) return [];
 
+  // 1️⃣ Buscar lives activos
   const searchUrl = new URL("https://www.googleapis.com/youtube/v3/search");
   searchUrl.searchParams.set("key", API_KEY);
   searchUrl.searchParams.set("channelId", CHANNEL_ID);
   searchUrl.searchParams.set("part", "id,snippet");
   searchUrl.searchParams.set("eventType", "live");
   searchUrl.searchParams.set("type", "video");
-  searchUrl.searchParams.set("maxResults", "2");
+  searchUrl.searchParams.set("maxResults", "3");
 
   const searchJson = await fetchJson(searchUrl.toString());
 
@@ -63,13 +65,22 @@ export const getLiveNow = cache(async (): Promise<YTVideoItem[]> => {
 
   if (!ids.length) return [];
 
+  // 2️⃣ Obtener detalles completos
   const videosUrl = new URL("https://www.googleapis.com/youtube/v3/videos");
   videosUrl.searchParams.set("key", API_KEY);
   videosUrl.searchParams.set("part", "snippet,liveStreamingDetails");
   videosUrl.searchParams.set("id", ids.join(","));
 
   const videosJson = await fetchJson(videosUrl.toString());
-  return videosJson.items || [];
+
+  // 3️⃣ Filtro ultra seguro de live activo
+  return (videosJson.items || []).filter((v: any) => {
+    const live = v.liveStreamingDetails;
+    return (
+      live?.actualStartTime &&
+      !live?.actualEndTime
+    );
+  });
 });
 
 /* ======================================================
