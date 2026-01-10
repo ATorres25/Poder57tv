@@ -296,7 +296,7 @@ export default async function Home() {
         </section>
       )}
 
-      {/* ================= TRANSMISIONES ANTERIORES ================= */}
+      {/* ================ TRANSMISIONES ANTERIORES ================ */}
       {pastLives.length > 0 && (
         <section>
           <h2 className="text-xl font-extrabold mb-4">
