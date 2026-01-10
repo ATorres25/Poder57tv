@@ -1,9 +1,7 @@
 // app/api/uploadthing/core.ts
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
-const f = createUploadthing({
-  token: process.env.UPLOADTHING_TOKEN,
-});
+const f = createUploadthing();
 
 export const ourFileRouter = {
   newsImage: f({
@@ -13,7 +11,6 @@ export const ourFileRouter = {
     },
   })
     .middleware(async () => {
-      // aquí puedes validar auth si quieres
       return {};
     })
     .onUploadComplete(async ({ file }) => {
