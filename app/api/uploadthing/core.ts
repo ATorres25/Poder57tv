@@ -1,7 +1,8 @@
-// app/api/uploadthing/core.ts
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
-const f = createUploadthing();
+const f = createUploadthing({
+  token: process.env.UPLOADTHING_TOKEN,
+});
 
 export const ourFileRouter = {
   newsImage: f({
