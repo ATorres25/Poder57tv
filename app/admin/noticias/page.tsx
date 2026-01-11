@@ -9,6 +9,7 @@ import {
   query,
   updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ type Noticia = {
   title: string;
   date: any;
   priority?: "main" | "side" | null;
+  image?: string;
 };
 
 export default function AdminNoticiasPage() {
@@ -42,6 +44,8 @@ export default function AdminNoticiasPage() {
 
   // 📥 Cargar noticias
   async function loadNoticias() {
+    setLoading(true);
+
     const q = query(
       collection(db, "noticias"),
       orderBy("date", "desc")
@@ -69,7 +73,6 @@ export default function AdminNoticiasPage() {
   ) {
     const ref = doc(db, "noticias", id);
 
-    // si es principal, quitar a las demás
     if (priority === "main") {
       const main = noticias.find((n) => n.priority === "main");
       if (main && main.id !== id) {
@@ -81,6 +84,45 @@ export default function AdminNoticiasPage() {
 
     await updateDoc(ref, { priority });
     await loadNoticias();
+  }
+
+  // 🗑️ BORRAR NOTICIA + IMAGEN
+  async function deleteNoticia(
+    id: string,
+    title: string,
+    image?: string
+  ) {
+    const ok = confirm(
+      `¿Seguro que deseas eliminar la noticia:\n\n"${title}"?\n\nEsta acción no se puede deshacer.`
+    );
+
+    if (!ok) return;
+
+    try {
+      // 🧨 1. Borrar imagen de UploadThing
+      if (image) {
+        const fileKey = image.split("/f/")[1];
+
+        if (fileKey) {
+          await fetch("/api/uploadthing/delete", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ fileKey }),
+          });
+        }
+      }
+
+      // 🗑️ 2. Borrar noticia de Firestore
+      await deleteDoc(doc(db, "noticias", id));
+
+      // ⚡ 3. Actualizar UI
+      setNoticias((prev) => prev.filter((n) => n.id !== id));
+    } catch (err) {
+      console.error("Error al borrar noticia:", err);
+      alert("Error al borrar la noticia");
+    }
   }
 
   return (
@@ -157,6 +199,15 @@ export default function AdminNoticiasPage() {
                 >
                   Editar
                 </Link>
+
+                <button
+                  onClick={() =>
+                    deleteNoticia(n.id, n.title, n.image)
+                  }
+                  className="bg-red-700 hover:bg-red-800 px-3 py-1 rounded text-sm"
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
