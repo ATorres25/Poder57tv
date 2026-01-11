@@ -27,12 +27,10 @@ export default function FacebookGalleries() {
 
     setIsMobile(checkMobile());
 
-    const onResize = () =>
-      setIsMobile(checkMobile());
-
+    const onResize = () => setIsMobile(checkMobile());
     window.addEventListener("resize", onResize);
-    return () =>
-      window.removeEventListener("resize", onResize);
+
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   /* ======================
@@ -42,12 +40,9 @@ export default function FacebookGalleries() {
     async function load() {
       try {
         const data = await getFacebookGalleries();
-
         const activeGalleries = data
           .filter((g) => g.active)
-          .sort(
-            (a, b) => a.position - b.position
-          );
+          .sort((a, b) => a.position - b.position);
 
         setGalleries(activeGalleries);
       } catch (e) {
@@ -66,9 +61,7 @@ export default function FacebookGalleries() {
   if (loading) {
     return (
       <section>
-        <h2 className="text-xl font-extrabold mb-4">
-          Galerías
-        </h2>
+        <h2 className="text-xl font-extrabold mb-4">Galerías</h2>
         <div className="text-center text-gray-400">
           Cargando galerías...
         </div>
@@ -82,9 +75,7 @@ export default function FacebookGalleries() {
   if (galleries.length === 0) {
     return (
       <section>
-        <h2 className="text-xl font-extrabold mb-4">
-          Galerías
-        </h2>
+        <h2 className="text-xl font-extrabold mb-4">Galerías</h2>
         <div className="text-center text-gray-500">
           No hay galerías activas
         </div>
@@ -97,9 +88,7 @@ export default function FacebookGalleries() {
   ====================== */
   return (
     <section>
-      <h2 className="text-xl font-extrabold mb-4">
-        Galerías
-      </h2>
+      <h2 className="text-xl font-extrabold mb-4">Galerías</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {galleries.map((g) => {
@@ -107,20 +96,19 @@ export default function FacebookGalleries() {
             g.facebookUrl
           )}&fields=og_object{image}`;
 
-          const showTextFallback =
-            isMobile && imgError[g.position];
+          const showFallback = imgError[g.position];
 
           return (
             <div
               key={g.position}
-              className="bg-gray-900 rounded-xl overflow-hidden"
+              className="bg-gray-900 rounded-xl overflow-hidden hover-lift"
             >
-              {/* DESKTOP */}
+              {/* ================= DESKTOP ================= */}
               {!isMobile && (
                 <FacebookPost url={g.facebookUrl} />
               )}
 
-              {/* MOBILE */}
+              {/* ================= MOBILE ================= */}
               {isMobile && (
                 <a
                   href={g.facebookUrl}
@@ -128,8 +116,8 @@ export default function FacebookGalleries() {
                   rel="noopener noreferrer"
                   className="block"
                 >
-                  {!showTextFallback && (
-                    <div className="relative aspect-video bg-black">
+                  <div className="relative aspect-video bg-black">
+                    {!showFallback && (
                       <Image
                         src={previewImg}
                         alt="Galería Facebook"
@@ -143,29 +131,22 @@ export default function FacebookGalleries() {
                           }))
                         }
                       />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <span className="bg-blue-600 px-4 py-2 rounded text-sm font-bold">
-                          Ver galería
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* TEXTO FALLBACK */}
-                  {showTextFallback && (
-                    <div className="p-6 text-center space-y-3">
-                      <p className="text-lg font-bold">
-                        Galería en Facebook
-                      </p>
-                      <p className="text-sm text-gray-300">
-                        Toca para ver las imágenes completas
-                        directamente en Facebook.
-                      </p>
-                      <span className="inline-block bg-blue-600 px-4 py-2 rounded text-sm font-bold">
-                        Abrir galería
+                    {/* OVERLAY */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col items-center justify-center gap-3">
+                      <Image
+                        src="/facebook.png"
+                        alt="Facebook"
+                        width={36}
+                        height={36}
+                      />
+
+                      <span className="bg-blue-600 px-4 py-2 rounded-full text-sm font-extrabold">
+                        Ver galería en Facebook
                       </span>
                     </div>
-                  )}
+                  </div>
                 </a>
               )}
             </div>
